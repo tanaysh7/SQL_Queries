@@ -97,10 +97,10 @@ SELECT * FROM players;
 
 
 
-SELECT group_id,player_id,max(winner_score)
+SELECT group_id,winner_score,winner_id
     FROM players
     JOIN (
-    SELECT
+    SELECT SUM(
         CASE
             WHEN first_score > second_score THEN  first_score 
             
@@ -108,7 +108,7 @@ SELECT group_id,player_id,max(winner_score)
            
             WHEN first_score = second_score THEN first_score 
          
-        END AS winner_score,
+        END) AS winner_score,
        
         CASE
             WHEN first_score > second_score THEN  first_player
@@ -116,7 +116,8 @@ SELECT group_id,player_id,max(winner_score)
             WHEN first_score = second_score AND first_player > second_player THEN second_player
             WHEN first_score = second_score AND first_player < second_player THEN first_player
         END AS winner_id
-        FROM matches) AS winner_table
+        FROM matches
+        group by winner_id) AS winner_table
     ON players.player_id = winner_table.winner_id
-    GROUP BY group_id,player_id
+    group by group_id,winner_id
     ;
